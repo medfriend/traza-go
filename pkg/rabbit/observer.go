@@ -1,4 +1,4 @@
-package rabbitObserver
+package rabbit
 
 import (
     "context"
@@ -7,6 +7,16 @@ import (
 
     "github.com/rabbitmq/amqp091-go"
 )
+
+// Connect crea una conexión a RabbitMQ.
+func Connect(rabbitURL string) (*amqp091.Connection, error) {
+    conn, err := amqp091.Dial(rabbitURL)
+    if err != nil {
+        return nil, fmt.Errorf("error al conectar con RabbitMQ: %w", err)
+    }
+    log.Println("Conectado a RabbitMQ con éxito.")
+    return conn, nil
+}
 
 // Observer representa un observador para una cola de RabbitMQ.
 type Observer struct {
@@ -17,18 +27,17 @@ type Observer struct {
 }
 
 // NewObserver crea una nueva instancia de Observer.
-func NewObserver(conn *amqp091.Connection, queueName string, handleFunc func(msg amqp091.Delivery)) (*Observer, error) {
+func NewObserver(conn *amqp091.Connection, queueName string, handleFunc func(msg amqp091.Delivery)) *Observer {
     ch, err := conn.Channel()
     if err != nil {
-        return nil, fmt.Errorf("error creando canal de RabbitMQ: %w", err)
+        log.Fatalf("Error creando canal de RabbitMQ: %v", err)
     }
-    // devuelve la referencia del puntero
     return &Observer{
         queueName:  queueName,
         handleFunc: handleFunc,
         conn:       conn,
         ch:         ch,
-    }, nil
+    }
 }
 
 // Start comienza a escuchar la cola y ejecuta la función de manejo cuando llega un mensaje.
