@@ -11,15 +11,33 @@ import (
     "traza-go/pkg/services"
 
     "github.com/joho/godotenv"
+    gormUtil "github.com/medfriend/shared-commons-go/util/gorm"
+    "github.com/medfriend/shared-commons-go/util/consul"
+	"github.com/medfriend/shared-commons-go/util/env"
+    "gorm.io/gorm"
 )
+var db *gorm.DB
 
 func main() {
+  env.LoadEnv()
+	consulClient := consul.ConnectToConsulKey(os.Getenv("SERVICE_NAME"))
+
+    initDB, err := gormUtil.InitDB(
+		db,
+		consulClient,
+		os.Getenv("SERVICE_STATUS"),
+	)
+	if err != nil {
+		return
+	}
+
     // Cargar variables de entorno
+
     if err := godotenv.Load(); err != nil {
         log.Println("Advertencia: No se pudo cargar el archivo .env")
     }
     rabbitMQURL := os.Getenv("RABBITMQ_URL")
-    log.Println("Advertencia", rabbitMQURL)
+
     if rabbitMQURL == "" {
         log.Fatal("RABBITMQ_URL no está configurada")
     }
