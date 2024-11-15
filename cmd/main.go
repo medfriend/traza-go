@@ -9,7 +9,8 @@ import (
     "syscall"
     "traza-go/pkg/rabbit"
     "traza-go/pkg/services"
-
+    "traza-go/pkg/repository"
+    "github.com/rabbitmq/amqp091-go"
     "github.com/joho/godotenv"
     gormUtil "github.com/medfriend/shared-commons-go/util/gorm"
     "github.com/medfriend/shared-commons-go/util/consul"
@@ -32,7 +33,6 @@ func main() {
 	}
 
     // Cargar variables de entorno
-
     if err := godotenv.Load(); err != nil {
         log.Println("Advertencia: No se pudo cargar el archivo .env")
     }
@@ -49,14 +49,28 @@ func main() {
     }
     defer conn.Close()
 
-    // Crear observadores para cada cola
-    observers := []*rabbit.Observer{
-        rabbit.NewObserver(conn, "trazabilidad-accion", services.HandleAccion),
-        rabbit.NewObserver(conn, "trazabilidad-login", services.HandleLogin),
+    loginRepo := repository.NewLoginRepository(initDB)
+    loginService := services.NewLoginService(loginRepo)
+
+     // Crear funciones de manejo que utilizan los servicios
+     handleFuncAccion := func(msg amqp091.Delivery) {
+        log.Println("Consumer accion:", msg.Body)
     }
 
-    // Iniciar cada observador
-    for _, observer := range observers {
+    handleFuncLogin := func(msg amqp091.Delivery) {
+        loginService.Save(msg.Body)
+    }
+
+
+  // Crear observadores para cada cola, asociando con los handlers adecuados
+    observers := []*rabbit.Observer{
+        rabbit.NewObserver(conn, "trazabilidad-accion", handleFuncAccion),
+        rabbit.NewObserver(conn, "trazabilidad-usuario-login", handleFuncLogin),
+    }
+
+
+     // Iniciar cada observador
+     for _, observer := range observers {
         if err := observer.Start(context.Background()); err != nil {
             log.Fatalf("Error al iniciar observador: %v", err)
         }
