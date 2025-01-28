@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/medfriend/shared-commons-go/util/consul"
 	"github.com/medfriend/shared-commons-go/util/env"
-	zmq4 "github.com/pebbe/zmq4/draft"
 	"github.com/rabbitmq/amqp091-go"
 	"log"
 	"os"
@@ -14,29 +13,18 @@ import (
 	"syscall"
 	"time"
 	"traza-go/rabbit"
+	"traza-go/zero"
 )
 
 func main() {
 	env.LoadEnv()
 	consulClient := consul.ConnectToConsulKey(os.Getenv("SERVICE_NAME"))
 
-	rabbitInfo, _ := consul.GetKeyValue(consulClient, "RABBIT")
-
-	var resultRabbitmq map[string]string
-
-	err := json.Unmarshal([]byte(rabbitInfo), &resultRabbitmq)
+	conn, err := rabbit.ConnRabbitMQ(consulClient)
 
 	if err != nil {
 		return
 	}
-
-	s := fmt.Sprintf("amqp://%s:%s@%s:%s/",
-		resultRabbitmq["RABBIT_USER"],
-		resultRabbitmq["RABBIT_PASSWORD"],
-		resultRabbitmq["RABBIT_HOST"],
-		resultRabbitmq["RABBIT_PORT"])
-
-	conn, err := rabbit.Connect(s)
 
 	defer func(conn *amqp091.Connection) {
 		err := conn.Close()
@@ -45,29 +33,7 @@ func main() {
 		}
 	}(conn)
 
-	queues := map[string]int{
-		"queue1": 5555,
-		"queue2": 5556,
-		"queue3": 5557,
-	}
-
-	// Crear sockets ZeroMQ para cada puerto
-	zmqSockets := make(map[string]*zmq4.Socket)
-
-	for queue, port := range queues {
-		socket, err := zmq4.NewSocket(zmq4.PUSH)
-		if err != nil {
-			log.Fatalf("Error creando ZeroMQ socket para la cola %s: %v", queue, err)
-		}
-
-		err = socket.Bind(fmt.Sprintf("tcp://*:%d", port))
-		if err != nil {
-			log.Fatalf("Error enlazando el socket ZeroMQ al puerto %d: %v", port, err)
-		}
-
-		log.Printf("ZeroMQ socket (PUSH) para %s enlazado en tcp://*:%d", queue, port)
-		zmqSockets[queue] = socket
-	}
+	queues, zmqSockets := zero.ConnZero()
 
 	observers := make([]*rabbit.Observer, 0)
 	for queue := range queues {
@@ -123,5 +89,4 @@ func main() {
 		observer.Stop()
 	}
 	fmt.Println("Todos los observadores detenidos.")
-
 }
