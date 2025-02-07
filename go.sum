@@ -114,6 +114,8 @@ github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/medfriend/shared-commons-go v0.0.93 h1:KTz2YgRn78hULfaW9hfaZMzLITnZGF6fZix8qm7vW9s=
 github.com/medfriend/shared-commons-go v0.0.93/go.mod h1:JLuRN50xU4tx9lS2AP2dodJwBSsDDRK2IcTNh8T4eKA=
+github.com/medfriend/shared-commons-go v0.1.5 h1:bXB0BmTqIFRFuJ5JANuwMvkpB5ydm5+uiaUL1fJXCdA=
+github.com/medfriend/shared-commons-go v0.1.5/go.mod h1:/jMCV8/FbBV4kXQZBJrhlVNVIWkS1zb7KQ8IS36DNGo=
 github.com/miekg/dns v1.1.26/go.mod h1:bPDLeHnStXmXAq1m/Ch/hvfNHr14JKNPMBo3VZKjuso=
 github.com/miekg/dns v1.1.41 h1:WMszZWJG0XmzbK9FEmzH2TVcqYzFesusSIB41b8KHxY=
 github.com/miekg/dns v1.1.41/go.mod h1:p6aan82bvRIyn+zDIv9xYNUpwa73JcSh9BKwknJysuI=

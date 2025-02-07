@@ -1,8 +1,9 @@
 module traza-go
 
-go 1.23.2
+go 1.23.3
 
 require (
+	github.com/hashicorp/consul/api v1.30.0
 	github.com/medfriend/shared-commons-go v0.0.93
 	github.com/pebbe/zmq4 v1.2.11
 	github.com/rabbitmq/amqp091-go v1.10.0
@@ -11,7 +12,6 @@ require (
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
-	github.com/hashicorp/consul/api v1.30.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect

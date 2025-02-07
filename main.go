@@ -46,6 +46,7 @@ func main() {
 			message := map[string]interface{}{
 				"message": string(msg.Body),
 				"time":    time.Now().Format(time.RFC3339),
+				"user":    msg.Headers["user"],
 			}
 
 			// Serializar el mensaje a JSON
