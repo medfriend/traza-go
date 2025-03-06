@@ -6,10 +6,7 @@ import (
 	"log"
 )
 
-func ConnZero() (map[string]int, map[string]*zmq4.Socket) {
-	queues := map[string]int{
-		"chat-bot": 5555,
-	}
+func ConnZero(queues map[string]int) (map[string]int, map[string]*zmq4.Socket) {
 
 	// Crear sockets ZeroMQ para cada puerto
 	zmqSockets := make(map[string]*zmq4.Socket)

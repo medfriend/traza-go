@@ -20,11 +20,9 @@ func main() {
 	env.LoadEnv()
 	consulClient := consul.ConnectToConsulKey(os.Getenv("SERVICE_NAME"))
 
-	conn, err := rabbit.ConnRabbitMQ(consulClient)
+	conn, services := rabbit.ConnRabbitMQ(consulClient)
 
-	if err != nil {
-		return
-	}
+	fmt.Println(services)
 
 	defer func(conn *amqp091.Connection) {
 		err := conn.Close()
@@ -33,7 +31,7 @@ func main() {
 		}
 	}(conn)
 
-	queues, zmqSockets := zero.ConnZero()
+	queues, zmqSockets := zero.ConnZero(services)
 
 	observers := make([]*rabbit.Observer, 0)
 	for queue := range queues {
